@@ -8,7 +8,7 @@ var https = require('https');
 //Database
 var mongo = require('mongodb');
 var monk = require('monk');
-var db = monk('localhost:27017/kwikileaks');
+var db = monk('mongodb://kwleaks:kwikipassword@ds221228.mlab.com:21228/heroku_0rvdj3c6');
 var cors = require('cors');
 
 //for login and session stuff
