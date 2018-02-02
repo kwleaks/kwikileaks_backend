@@ -12,7 +12,7 @@ var db = monk('localhost:27017/kwikileaks');
 var cors = require('cors');
 
 //for login and session stuff
-var bcrypt = require('bcrypt');
+// var bcrypt = require('bcrypt');
 var session = require('express-session');
 var MongoStore = require('connect-mongo');
 // var multer = require('multer');
@@ -22,8 +22,8 @@ var async = require('async');
 
 
 var index = require('./routes/index');
-var users = require('./routes/users');
-var cursession = require('./routes/session');
+// var users = require('./routes/users');
+// var cursession = require('./routes/session');
 var fake = require('./routes/fakedata');
 
 var app = express();
@@ -62,8 +62,8 @@ app.use(session({
 }))
 
 app.use('/', index);
-app.use('/users', users);
-app.use('/session', cursession)
+// app.use('/users', users);
+// app.use('/session', cursession)
 app.use('/fake', fake)
 
 // catch 404 and forward to error handler
