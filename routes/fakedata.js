@@ -93,13 +93,12 @@ router.get('/findAll', function(req, res, next) {
 						body += data;
 					});
 					res.on("end", () => {
-						completed_requests++;
 						body = JSON.parse(body);
 						if (body.result) {
 						if (body.result.opening_hours) {
-							docs[i].open_now = body.result.opening_hours.open_now
+							doc.open_now = body.result.opening_hours.open_now
 						} else {
-							docs[i].open_now = 'unknown'
+							doc.open_now = 'unknown'
 							}	
 						}
 						cB();
@@ -117,93 +116,9 @@ router.get('/findAll', function(req, res, next) {
 				res.status(200).send(docs);
 			}
 		})
-	// if (docs) {
-	// 	function sendDocs() {
-	// 		res.send(docs);
-	// 	}
-	// 	let completed_requests = 0;
-	// 	for (let i=0; i<docs.length; i++) {
-	// 		console.log('hello')
-	// 		if (docs[i].googleID) {
-	// 			https.get("https://maps.googleapis.com/maps/api/place/details/json?key=AIzaSyCm5Sz261KXfwM82StwusIE__NxsJ6cemc&placeid="+docs[i].googleID, (res) => {
-					// res.setEncoding("utf8");
-					// let body = "";
-					// res.on("data", data => {
-					// 	body += data;
-					// });
-					// res.on("end", () => {
-					// 	completed_requests++;
-					// 	body = JSON.parse(body);
-					// 	if (body.result) {
-					// 	if (body.result.opening_hours) {
-					// 		docs[i].open_now = body.result.opening_hours.open_now
-					// 	} else {
-					// 		docs[i].open_now = 'unknown'
-					// 	}
-	// 				} else {
-	// 					docs[i].open_now = 'unknown'
-	// 				}
-	// 				})
-	// 			})
-	// 		} else {
-	// 			completed_requests++;
-	// 			docs[i].open_now = 'unknown';
-	// 		}
-	// 		if (completed_requests === docs.length) {
-	// 			sendDocs();
-	// 		}
-	// 	}
-	// 	} else {
-	// 		res.send('nothing there!')
-	// 	}
-
-
-
 		}
-	})
-	// collection.find({}).then((docs) => {
-	// 	if (docs) {
-	// 	function sendDocs() {
-	// 		res.send(docs);
-	// 	}
-	// 	let completed_requests = 0;
-	// 	// for each toilet in DB, check google places api to see whether open now
-	// 	for (let i=0; i<docs.length; i++) {
-	// 		if (docs[i].googleID) {
-	// 			https.get("https://maps.googleapis.com/maps/api/place/details/json?key=AIzaSyCm5Sz261KXfwM82StwusIE__NxsJ6cemc&placeid="+docs[i].googleID, (res) => {
-	// 				res.setEncoding("utf8");
-	// 				let body = "";
-	// 				res.on("data", data => {
-	// 					body += data;
-	// 				});
-	// 				res.on("end", () => {
-	// 					completed_requests++;
-	// 					body = JSON.parse(body);
-	// 					if (body.result) {
-	// 					if (body.result.opening_hours) {
-	// 						docs[i].open_now = body.result.opening_hours.open_now
-	// 					} else {
-	// 						docs[i].open_now = 'unknown'
-	// 					}
-	// 				} else {
-	// 					docs[i].open_now = 'unknown'
-	// 				}
-	// 						// send once all have been completed
-	// 						if (completed_requests === docs.length) {
-	// 							sendDocs();
-	// 						}
-	// 				})
-	// 			})
-	// 		} else {
-	// 			completed_requests++;
-	// 			docs[i].open_now = 'unknown';
-	// 		}
-	// 	}
-	// 	} else {
-	// 		res.send('nothing there!')
-	// 	}
+})
 
-	// })
 })
 
 
