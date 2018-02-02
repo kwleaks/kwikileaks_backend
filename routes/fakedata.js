@@ -81,15 +81,12 @@ router.get('/findAll', function(req, res, next) {
 			res.status(500).send({msg: err})
 		} else {
 			// res.status(200).send(docs);
-	if (docs) {
-		function sendDocs() {
-			res.send(docs);
-		}
-		let completed_requests = 0;
-		for (let i=0; i<docs.length; i++) {
-			console.log('hello')
-			if (docs[i].googleID) {
-				https.get("https://maps.googleapis.com/maps/api/place/details/json?key=AIzaSyCm5Sz261KXfwM82StwusIE__NxsJ6cemc&placeid="+docs[i].googleID, (res) => {
+		if (!docs) {
+			res.status(200).send({})
+		} 
+		async.each(docs, (doc, cB) => {
+			if (doc.googleID) {
+				https.get("https://maps.googleapis.com/maps/api/place/details/json?key=AIzaSyCm5Sz261KXfwM82StwusIE__NxsJ6cemc&placeid=" + doc.googleID, (res) => {
 					res.setEncoding("utf8");
 					let body = "";
 					res.on("data", data => {
@@ -103,23 +100,62 @@ router.get('/findAll', function(req, res, next) {
 							docs[i].open_now = body.result.opening_hours.open_now
 						} else {
 							docs[i].open_now = 'unknown'
+							}	
 						}
-					} else {
-						docs[i].open_now = 'unknown'
-					}
+						cB();
 					})
-				})
+				}) 
 			} else {
-				completed_requests++;
-				docs[i].open_now = 'unknown';
+				doc.open_now = 'unknown';
+				cB();
 			}
-			if (completed_requests === docs.length) {
-				sendDocs();
+		}, (err) => {
+			if (err) {
+				console.log('error')
+				res.status(500).send({msg:err})
+			} else {
+				res.status(200).send(docs);
 			}
-		}
-		} else {
-			res.send('nothing there!')
-		}
+		})
+	// if (docs) {
+	// 	function sendDocs() {
+	// 		res.send(docs);
+	// 	}
+	// 	let completed_requests = 0;
+	// 	for (let i=0; i<docs.length; i++) {
+	// 		console.log('hello')
+	// 		if (docs[i].googleID) {
+	// 			https.get("https://maps.googleapis.com/maps/api/place/details/json?key=AIzaSyCm5Sz261KXfwM82StwusIE__NxsJ6cemc&placeid="+docs[i].googleID, (res) => {
+					// res.setEncoding("utf8");
+					// let body = "";
+					// res.on("data", data => {
+					// 	body += data;
+					// });
+					// res.on("end", () => {
+					// 	completed_requests++;
+					// 	body = JSON.parse(body);
+					// 	if (body.result) {
+					// 	if (body.result.opening_hours) {
+					// 		docs[i].open_now = body.result.opening_hours.open_now
+					// 	} else {
+					// 		docs[i].open_now = 'unknown'
+					// 	}
+	// 				} else {
+	// 					docs[i].open_now = 'unknown'
+	// 				}
+	// 				})
+	// 			})
+	// 		} else {
+	// 			completed_requests++;
+	// 			docs[i].open_now = 'unknown';
+	// 		}
+	// 		if (completed_requests === docs.length) {
+	// 			sendDocs();
+	// 		}
+	// 	}
+	// 	} else {
+	// 		res.send('nothing there!')
+	// 	}
 
 
 
