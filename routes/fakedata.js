@@ -77,6 +77,7 @@ router.get('/findAll', function(req, res, next) {
 	let collection = db.get('bathrooms');
 	collection.find({}, (err, docs) => {
 		if (err) {
+			console.log(err);
 			res.status(500).send({msg: err})
 		} else {
 			// res.status(200).send(docs);
@@ -86,6 +87,7 @@ router.get('/findAll', function(req, res, next) {
 		}
 		let completedRequests = 0;
 		for (let i=0; i<docs.length; i++) {
+			console.log('hello')
 			if (docs[i].googleID) {
 				https.get("https://maps.googleapis.com/maps/api/place/details/json?key=AIzaSyCm5Sz261KXfwM82StwusIE__NxsJ6cemc&placeid="+docs[i].googleID, (res) => {
 					res.setEncoding("utf8");
