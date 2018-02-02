@@ -176,6 +176,7 @@ router.post('/createNew', function(req, res, next) {
 		},
 		(docID, cB) => {
 			console.log('at insert review stage');
+			console.log(docID)
 			let review = {
 				toiletID: docID,
 				stars: req.body.rating ? req.body.rating: null,
@@ -192,6 +193,7 @@ router.post('/createNew', function(req, res, next) {
 			if (req.body.rating || req.body.comments) {
 				reviews.insert(review, (err, doc) => {
 					if (err) {
+						console.log(err);
 						console.log('error inserting review');
 						cB(err);
 					} else {
@@ -238,18 +240,23 @@ router.post('/createNew', function(req, res, next) {
 					})
 				}		
 			} else {
-				cB(null, 'done');
+				cB(null, docID);
 			}
 		}
 		], function (error, result) {
 			if (error) {
-				console.log('error at end of callback');
-				res.status(500).send({msg: "error at end of callback: " + error})
+				if (error === 'already exists') {
+					res.status(200).send({msg: "already exists"})
+				} else {
+					console.log('error at end of callback');
+					res.status(500).send({msg: "error at end of callback: " + error})
+				}
+				
 			}
 			else {
 					let x = {
 						msg: 'all good',
-						id: docID
+						id: result
 					}
 					res.status(200).send(x)
 				}}
