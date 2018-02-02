@@ -76,6 +76,7 @@ router.get('/findAll', function(req, res, next) {
 	let db = req.db;
 	let collection = db.get('bathrooms');
 	collection.find({}).then((docs) => {
+		if (docs) {
 		function sendDocs() {
 			res.send(docs);
 		}
@@ -112,6 +113,10 @@ router.get('/findAll', function(req, res, next) {
 				docs[i].open_now = 'unknown';
 			}
 		}
+		} else {
+			res.send('nothing there!')
+		}
+
 	})
 })
 
