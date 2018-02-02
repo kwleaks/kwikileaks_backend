@@ -142,20 +142,28 @@ router.post('/createNew', function(req, res, next) {
 		hours: req.body.hours ? req.body.hours : null,
 		type: req.body.type ? req.body.type : null
 	};
-	// check whether already exists in DB (by finding toilets within 1 miles and comparing things)
-	let query = {"geolocation": {"$nearSphere": {"$geometry": {"type": "Point","coordinates": [newToilet.longitude, newToilet.latitude]},"$maxDistance": 1609.34}}}
-	collection.find(query, (err, results) => {
-		if (err) {
-			res.status(500).send({msg: err})
-		} else {
-			for (let i=0; i<results.length; i++) {
-				if (results[i].name === newToilet.name || results[i].location === newToilet.location || results[i].googleID === newToilet.googleID) {
-					res.status(200).send({msg: 'this toilet already exists'})
-				}
-			}
-	// if toilet does not exist already, insert it to 3 collections using waterfall & write file to photos
+	// check whether already exists in DB
+
+
+	// waterfall inserts to bathrooms collection, then review collection, then writes file to photos
 	async.waterfall([
 		(cB) => {
+			let query = {"geolocation": {"$nearSphere": {"$geometry": {"type": "Point","coordinates": [newToilet.longitude, newToilet.latitude]},"$maxDistance": 1609.34}}}
+			collection.find(query, (err, results) => {
+				if (err) {
+					cB(err)
+				} else {
+					for (let i=0; i<results.length; i++) {
+						if (results[i].name === newToilet.name || results[i].location === newToilet.location || results[i].googleID === newToilet.googleID) {
+							// res.status(200).send({msg: 'this toilet already exists'})
+							cB('already exists')
+						}
+					}
+				}
+				cB(null, true)
+			})
+		},
+		(x, cB) => {
 			console.log('at insert toilet stage');
 			collection.insert(newToilet, (err, doc) => {
 				if (err) {
@@ -246,10 +254,6 @@ router.post('/createNew', function(req, res, next) {
 					res.status(200).send(x)
 				}}
 		)
-
-		}
-	})
-
 });
 
 
