@@ -85,7 +85,7 @@ router.get('/findAll', function(req, res, next) {
 		function sendDocs() {
 			res.send(docs);
 		}
-		let completedRequests = 0;
+		let completed_requests = 0;
 		for (let i=0; i<docs.length; i++) {
 			console.log('hello')
 			if (docs[i].googleID) {
