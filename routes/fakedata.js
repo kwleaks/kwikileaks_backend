@@ -128,7 +128,7 @@ router.post('/createNew', function(req, res, next) {
 	let collection = db.get('bathrooms');
 	let reviews = db.get('reviews');
 	let photos = db.get('photos');
-	
+
 	let newToilet = {
 		name: req.body.name ? req.body.name : null,
 		location: req.body.location ? req.body.location : null,
@@ -142,7 +142,18 @@ router.post('/createNew', function(req, res, next) {
 		hours: req.body.hours ? req.body.hours : null,
 		type: req.body.type ? req.body.type : null
 	};
-	// waterfall inserts to bathrooms collection, then review collection, then writes file to photos
+	// check whether already exists in DB (by finding toilets within 1 miles and comparing things)
+	let query = {"geolocation": {"$nearSphere": {"$geometry": {"type": "Point","coordinates": [newToilet.longitude, newToilet.latitude]},"$maxDistance": 1609.34}}}
+	collection.find(query, (err, results) => {
+		if (err) {
+			res.status(500).send({msg: err})
+		} else {
+			for (let i=0; i<results.length; i++) {
+				if (results[i].name === newToilet.name || results[i].location === newToilet.location || results[i].googleID === newToilet.googleID) {
+					res.status(200).send({msg: 'this toilet already exists'})
+				}
+			}
+	// if toilet does not exist already, insert it to 3 collections using waterfall & write file to photos
 	async.waterfall([
 		(cB) => {
 			console.log('at insert toilet stage');
@@ -210,7 +221,7 @@ router.post('/createNew', function(req, res, next) {
 											console.log('error inserting photo reference')
 											cB(err);
 										} else {
-											cB(null, 'done');
+											cB(null, docID);
 										}
 									})
 								}
@@ -226,11 +237,19 @@ router.post('/createNew', function(req, res, next) {
 			if (error) {
 				console.log('error at end of callback');
 				res.status(500).send({msg: "error at end of callback: " + error})
-		}
-				else if (result === 'done') {
-					res.status(200).send({msg: 'all good'})
+			}
+			else {
+					let x = {
+						msg: 'all good',
+						id: docID
+					}
+					res.status(200).send(x)
 				}}
 		)
+
+		}
+	})
+
 });
 
 
